@@ -5,9 +5,19 @@ import * as libTemplates from "core/templates.js";
 import * as libLocation from "core/location.js";
 import * as libFs from "fs";
 
+/*	Base defines:
+*		{path}: path of directory
+*		{entries}: appended list of children
+*	Entry defines:
+*		{path}: path to entry
+*		{name}: name of entry
+*	Empty defines:
+		%none%
+*/
 const fileStorage = libLocation.makeStoragePath('share');
+const fileStatic = libLocation.makeAppPath(import.meta.url, 'static');
 
-function ListDirectory(msg, filePath) {
+function ListDirectory(msg, filePath, templates) {
 	var content = libFs.readdirSync(filePath);
 
 	/* cleanup the path to end in a slash */
@@ -23,7 +33,7 @@ function ListDirectory(msg, filePath) {
 	var entries = '';
 	if (content.length > 0) {
 		/* extract the entry-template to be used */
-		const teEntry = libTemplates.Load(libTemplates.ListDir.entry);
+		const teEntry = templates.entry;
 
 		/* expand all entries */
 		for (var i = 0; i < content.length; ++i) {
@@ -33,27 +43,28 @@ function ListDirectory(msg, filePath) {
 			if (content[i] == '..')
 				childPath = dirPath.substr(0, dirPath.lastIndexOf('/', dirPath.length - 2));
 
-			entries += libTemplates.Expand(teEntry, {
-				path: childPath,
-				name: content[i]
-			});
+			entries += libTemplates.Expand(teEntry, { path: childPath, name: content[i] });
 		}
 	}
 	else
-		entries = libTemplates.LoadExpanded(libTemplates.ListDir.empty, {});
+		entries = libTemplates.Expand(templates.empty, {});
 
 	/* update the path to not contain the trailing slash */
 	if (dirPath != '/')
 		dirPath = dirPath.substr(0, dirPath.length - 1);
 
 	/* construct the final template and return it */
-	const out = libTemplates.LoadExpanded(libTemplates.ListDir.base, { path: msg.relative, entries });
+	const out = libTemplates.Expand(templates.page, { path: msg.relative, entries });
 	msg.respondHtml(out);
 }
 
 export class Application {
 	constructor() {
 		this.path = '/share';
+
+		this.templateEmpty = libFs.readFileSync(fileStatic("empty.txt"), 'utf-8');
+		this.templateEntry = libFs.readFileSync(fileStatic("entry.txt"), 'utf-8');
+		this.templatePage = libFs.readFileSync(fileStatic("page.html"), 'utf-8');
 	}
 	request(msg) {
 		libLog.Log(`Shared handler for [${msg.relative}]`);
@@ -77,7 +88,7 @@ export class Application {
 
 			/* check if the path is a directory */
 			else if (what.isDirectory()) {
-				ListDirectory(msg, filePath);
+				ListDirectory(msg, filePath, { 'page': this.templatePage, 'entry': this.templateEntry, 'empty': this.templateEmpty });
 				return;
 			}
 		}
