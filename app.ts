@@ -40,7 +40,7 @@ export class Application implements libCommon.AppInterface {
 			dirPath = dirPath + '/';
 
 		/* check if the parent directory should be added */
-		if (client.relative != '/')
+		if (client.path != '/')
 			content = ['..'].concat(content);
 
 		/* check if entries have been found */
@@ -68,14 +68,14 @@ export class Application implements libCommon.AppInterface {
 			dirPath = dirPath.substring(0, dirPath.length - 1);
 
 		/* construct the final template and return it */
-		const out = libTemplates.Expand(this.templates.page, { path: client.relative, entries });
+		const out = libTemplates.Expand(this.templates.page, { path: client.path, entries });
 		client.respondHtml(out);
 	}
-	public request(basePath: string, client: libClient.HttpRequest): void {
-		libLog.Log(`Shared handler for [${client.relative}]`);
+	public request(client: libClient.HttpRequest): void {
+		libLog.Log(`Shared handler for [${client.path}]`);
 
 		/* expand the path */
-		const filePath = this.fileStorage(client.relative);
+		const filePath = this.fileStorage(client.path);
 
 		/* ensure the request is using the Get-method */
 		if (client.ensureMethod(['GET']) == null)
@@ -102,8 +102,8 @@ export class Application implements libCommon.AppInterface {
 		libLog.Log(`Request to unknown resource`);
 		client.respondNotFound();
 	}
-	public upgrade(basePath: string, client: libClient.HttpUpgrade): void {
-		libLog.Log(`Shared handler for [${client.relative}]`);
+	public upgrade(client: libClient.HttpUpgrade): void {
+		libLog.Log(`Shared handler for [${client.path}]`);
 		client.respondNotFound();
 	}
 };
