@@ -20,6 +20,7 @@ export class Share implements libCommon.ModuleInterface {
 	private templates: { entry: string, empty: string, page: string };
 	private fileStorage: (path: string) => string;
 
+	public name: string = 'share';
 	constructor(dataPath: string) {
 		this.fileStorage = libLocation.MakeLocation(dataPath);
 		const fileStatic = libLocation.MakeSelfPath(import.meta.url, '/static');
