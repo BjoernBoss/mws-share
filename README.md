@@ -15,5 +15,5 @@ Afterwards, transpile the entire server application, and set it up in the `setup
 
 ```JavaScript
 const app = await import("./maws-share/app.js");
-server.registerPath('/share', new app.Application('data-share-path'));
+server.registerPath('/share', new app.Application('path/to/shared/data'));
 ```

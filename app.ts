@@ -22,8 +22,8 @@ export class Application implements libCommon.AppInterface {
 	private fileStorage: (path: string) => string;
 
 	constructor(dataPath: string) {
-		this.fileStorage = libLocation.MakeStoragePath(dataPath);
-		const fileStatic = libLocation.MakeAppPath(import.meta.url, 'static');
+		this.fileStorage = libLocation.MakeLocation(dataPath);
+		const fileStatic = libLocation.MakeAppPath(import.meta.url, '/static');
 		this.templates = {
 			empty: libFs.readFileSync(fileStatic("empty.txt"), 'utf-8'),
 			entry: libFs.readFileSync(fileStatic("entry.txt"), 'utf-8'),
