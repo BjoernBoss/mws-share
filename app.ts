@@ -2,7 +2,6 @@
 /* Copyright (c) 2024-2025 Bjoern Boss Henrichsen */
 import * as libCommon from "core/common.js";
 import * as libClient from "core/client.js";
-import * as libLog from "core/log.js";
 import * as libTemplates from "core/templates.js";
 import * as libLocation from "core/location.js";
 import * as libFs from "fs";
@@ -72,7 +71,7 @@ export class Application implements libCommon.AppInterface {
 		client.respondHtml(out);
 	}
 	public request(client: libClient.HttpRequest): void {
-		libLog.Log(`Shared handler for [${client.path}]`);
+		client.log(`Shared handler for [${client.path}]`);
 
 		/* expand the path */
 		const filePath = this.fileStorage(client.path);
@@ -99,11 +98,11 @@ export class Application implements libCommon.AppInterface {
 		}
 
 		/* add the not found error */
-		libLog.Log(`Request to unknown resource`);
+		client.log(`Request to unknown resource`);
 		client.respondNotFound();
 	}
 	public upgrade(client: libClient.HttpUpgrade): void {
-		libLog.Log(`Shared handler for [${client.path}]`);
+		client.log(`Shared handler for [${client.path}]`);
 		client.respondNotFound();
 	}
 };
