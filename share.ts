@@ -16,13 +16,13 @@ import * as libFs from "fs";
 *	Empty defines:
 *		%none%
 */
-export class Application implements libCommon.AppInterface {
+export class Share implements libCommon.ModuleInterface {
 	private templates: { entry: string, empty: string, page: string };
 	private fileStorage: (path: string) => string;
 
 	constructor(dataPath: string) {
 		this.fileStorage = libLocation.MakeLocation(dataPath);
-		const fileStatic = libLocation.MakeAppPath(import.meta.url, '/static');
+		const fileStatic = libLocation.MakeSelfPath(import.meta.url, '/static');
 		this.templates = {
 			empty: libFs.readFileSync(fileStatic("empty.txt"), 'utf-8'),
 			entry: libFs.readFileSync(fileStatic("entry.txt"), 'utf-8'),
