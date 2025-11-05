@@ -4,6 +4,7 @@ import * as libCommon from "core/common.js";
 import * as libClient from "core/client.js";
 import * as libTemplates from "core/templates.js";
 import * as libLocation from "core/location.js";
+import * as libLog from "core/log.js";
 import * as libFs from "fs";
 
 /*	Directory templates
@@ -83,19 +84,21 @@ export class Share implements libCommon.ModuleInterface {
 
 		/* check if the path exists in the filesystem */
 		if (libFs.existsSync(filePath)) {
-			const what = libFs.lstatSync(filePath);
+			try {
+				const what = libFs.lstatSync(filePath);
 
-			/* check if the path is a file */
-			if (what.isFile()) {
-				client.tryRespondFile(filePath);
-				return;
-			}
+				/* check if the path is a file */
+				if (what.isFile())
+					client.tryRespondFile(filePath);
 
-			/* check if the path is a directory */
-			else if (what.isDirectory()) {
-				this.listDirectory(client, filePath);
-				return;
+				/* check if the path is a directory */
+				else if (what.isDirectory())
+					this.listDirectory(client, filePath);
+			} catch (e: any) {
+				libLog.Error(`Filesystem error while processing [${filePath}]: ${e.message}`);
+				client.respondInternalError('File operation failed');
 			}
+			return;
 		}
 
 		/* add the not found error */
