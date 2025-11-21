@@ -85,20 +85,19 @@ export class Share implements libCommon.ModuleInterface {
 		/* check if the path exists in the filesystem */
 		if (libFs.existsSync(filePath)) {
 			try {
-				const what = libFs.lstatSync(filePath);
+				const what = libFs.statSync(filePath);
 
 				/* check if the path is a file */
 				if (what.isFile())
-					client.tryRespondFile(filePath);
+					return client.tryRespondFile(filePath);
 
 				/* check if the path is a directory */
 				else if (what.isDirectory())
-					this.listDirectory(client, filePath);
+					return this.listDirectory(client, filePath);
 			} catch (e: any) {
 				libLog.Error(`Filesystem error while processing [${filePath}]: ${e.message}`);
-				client.respondInternalError('File operation failed');
+				return client.respondInternalError('File operation failed');
 			}
-			return;
 		}
 
 		/* add the not found error */
