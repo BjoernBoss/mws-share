@@ -70,7 +70,7 @@ export class Share implements libCommon.ModuleInterface {
 
 		/* construct the final template and return it */
 		const out = libTemplates.Expand(this.templates.page, { path: client.path, entries });
-		client.respondHtml(out);
+		client.respondText(out, 'html');
 	}
 	public request(client: libClient.HttpRequest): void {
 		client.log(`Shared handler for [${client.path}]`);
